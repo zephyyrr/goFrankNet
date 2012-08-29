@@ -1,8 +1,7 @@
 package main
 
 import (
-	"frank"
-	//www "webserver"
+	"github.com/Zephyyrr/goFrankNet/frank"
 	
 	"log"
 	"flag"

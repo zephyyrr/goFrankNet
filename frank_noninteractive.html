@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!-- 
+TODO
+DONE Add AJAX update of playlist and current song
+DONE Add form to add youtube songs.
+Make type form get options from types variable
+Add form to vote.
+-->
+<html>
+{{$state:=.}}
+<head>
+<title>Radio Frank - {{.Current}}</title>
+<!--<meta http-equiv="refresh" content="5">-->
+<link rel="stylesheet" type="text/css" href="/res/frank.css" />
+<script type="text/javascript" src="/res/frank.js"></script>
+<script type="text/javascript">
+	function init() {
+		update_playlist()
+		setInterval(update_current, 1000)
+		setInterval(update_voting, 1500)
+		setInterval(update_playlist, 1000)
+	}
+</script>
+
+</head>
+<body>
+	<h1>Radio Frank</h1>
+	<p id="current_container">
+		<strong>Currently playing:</strong> <span id="current">{{.Current}}</span>
+	</p>
+	<p id="voteData"></p>
+	<p id="playlist">
+		<noscript>
+		<table id="playlist_table">
+			<thead><tr><th colspan=2>Playlist</th></tr></thead>
+			<tbody>
+			{{range $k, $v := .Playlist}}<tr {{if $state.IsPlaying $v }}id="playing"{{end}}>
+				<td>{{indexOne $k}}.</td><td>{{$v}}</td></tr> 
+			{{end}}
+			</tbody>
+		</table>
+		</noscript>
+	</p>
+	<footer>
+		&copy;Zephyyrr
+	</footer>
+	<script>
+	<!--
+		init()
+	-->
+	</script>
+</body>
+</html> 

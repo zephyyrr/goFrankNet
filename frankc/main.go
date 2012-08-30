@@ -72,16 +72,16 @@ func main() {
 				case frank.BANNED: log.Printf("%s banned!", sp.Data)
 				case frank.SERVER_SHUTDOWN: log.Println("Server is shutting down!"); os.Exit(0)
 				case frank.MESSAGE: messageParser(sp.Data)
-				case frank.SONGUPDATE: Current_Update(state, sp.NowPlaying)
+				case frank.SONGUPDATE: state.Current_Update(sp.NowPlaying)
 				case frank.CLEAR_PLAYLIST: state.Playlist = make([]string, 0, 25)
-				case frank.USER_DISCONNECT: Users_Remove(state, sp.Data)
-				case frank.USER_CONNECT: Users_Add(state, sp.Data)
-				case frank.FULL_UPDATE: Full_Update(state, sp); log.Println("Full update recived!")
+				case frank.USER_DISCONNECT: state.Users_Remove(sp.Data)
+				case frank.USER_CONNECT: state.Users_Add(sp.Data)
+				case frank.FULL_UPDATE: state.Full_Update(sp); log.Println("Full update recived!")
 				case frank.ADDNEWSONG: state.Playlist = append(state.Playlist, sp.Data)
 				case frank.YOURADMIN: log.Println("You are an Admin!")
 				case frank.ADMINLOG: log.Printf("Admin: %s", sp.Data)
 				case frank.PING: conn.SendClientPackage(conn.MakeClientPackage(frank.PONG, ""))
-				case frank.STARTVOTE: SetVoting(state, sp)
+				case frank.STARTVOTE: state.SetVoting(sp)
 				default: log.Printf("%d: %s", sp.CommandType, sp.Data)
 			}
 		}
@@ -150,7 +150,7 @@ func TestHash() {
 	log.Printf("HashedPassword: %X", ps)
 }
 
-func Current_Update(state *State, current string) {
+func (state *State) Current_Update(current string) {
 	if current == "" {
 		state.Current = "Not Playing!"
 	} else { 
@@ -158,15 +158,15 @@ func Current_Update(state *State, current string) {
 	}
 }
 
-func Users_Add(state *State, user string) {
+func (state *State) Users_Add(user string) {
 	state.Users[user] = true
 }
 
-func Users_Remove(state *State, user string) {
+func (state *State) Users_Remove(user string) {
 	delete(state.Users, user)
 }
 
-func Full_Update(state *State, sp *frank.ServerPacket) {
+func (state *State) Full_Update(sp *frank.ServerPacket) {
 	Current_Update(state, sp.NowPlaying)
 	state.Playlist = sp.PlayList
 	state.Users = make(map[string]bool)
@@ -175,5 +175,15 @@ func Full_Update(state *State, sp *frank.ServerPacket) {
 	}
 }
 
-
+func (state *State) SetVoting(sp *frank.ServerPacket) {
+	switch sp.NowPlaying {
+		case "prew": state.Voting=sp.Data + " votes for previous song"
+		case "next": state.Voting=sp.Data + " votes for next song"
+		case "clear": state.Voting=sp.Data + " votes for clearing of playlist"
+	}
+	go func() {
+		time.Sleep(15*time.Second)
+		state.Voting="No voting in progress"
+	}()
+}
 

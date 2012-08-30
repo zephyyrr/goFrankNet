@@ -167,7 +167,7 @@ func (state *State) Users_Remove(user string) {
 }
 
 func (state *State) Full_Update(sp *frank.ServerPacket) {
-	Current_Update(state, sp.NowPlaying)
+	state.Current_Update(sp.NowPlaying)
 	state.Playlist = sp.PlayList
 	state.Users = make(map[string]bool)
 	for _, s := range sp.Users {

@@ -81,7 +81,7 @@ func main() {
 				case frank.YOURADMIN: log.Println("You are an Admin!")
 				case frank.ADMINLOG: log.Printf("Admin: %s", sp.Data)
 				case frank.PING: conn.SendClientPackage(conn.MakeClientPackage(frank.PONG, ""))
-				case frank.STARTVOTE: setVoting(state, sp)
+				case frank.STARTVOTE: SetVoting(state, sp)
 				default: log.Printf("%d: %s", sp.CommandType, sp.Data)
 			}
 		}

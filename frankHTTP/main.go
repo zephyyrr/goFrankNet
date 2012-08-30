@@ -76,11 +76,6 @@ func main() {
 	conn.Close()
 }
 
-func Test(conn *frank.FrankConn) {
-	TestHash()
-	SendTestPackets(conn)
-}
-
 func HashPass(password string) string {
 	hasher := sha1.New()
 	res := make([]byte, 0, 32)
@@ -165,7 +160,7 @@ func (state *State) Users_Remove(user string) {
 }
 
 func (state *State) Full_Update(sp *frank.ServerPacket) {
-	Current_Update(state, sp.NowPlaying)
+	state.Current_Update(sp.NowPlaying)
 	state.Playlist = sp.PlayList
 	state.Users = make(map[string]bool)
 	for _, s := range sp.Users {

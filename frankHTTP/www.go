@@ -1,15 +1,16 @@
 package main
 
 import (
-	"net/http"
+	"flag"
 	"html/template"
 	"log"
-	"flag"
+	"net/http"
 	//"io"
 	//"os"
 )
-const MAIN_HTML_NI="frank_noninteractive.html"
-const MAIN_HTML="frank.html"
+
+const MAIN_HTML_NI = "frank_noninteractive.html"
+const MAIN_HTML = "frank.html"
 const CURR_HTML = "{{.Current}}"
 const VOTE_HTML = "{{.Voting}}"
 const PL_TABLE_HTML = `
@@ -25,7 +26,7 @@ const PL_TABLE_HTML = `
 `
 
 var funcMap = template.FuncMap{
-	"indexOne": func(x int) int {return x+1},
+	"indexOne": func(x int) int { return x + 1 },
 }
 
 var templ_f func() interface{}
@@ -38,33 +39,14 @@ var vote_templ = template.Must(template.New("vote").Funcs(funcMap).Parse(VOTE_HT
 
 func ListenAndServe(addr string, f func() interface{}) error {
 	templ_f = f
-	flag.Parse()
-	http.HandleFunc("/", rootHandler)
-	http.Handle("/res/", http.FileServer(http.Dir(".")))
-	http.HandleFunc("/playlist/table", templ_Handl_Gen(plTable_templ))
-	http.HandleFunc("/current", templ_Handl_Gen(curr_templ))
-	http.HandleFunc("/vote", voteHandler)
-	if *ninteractive {
-		log.Println("Running in Non-Interactive mode")
-		temp_templ:=loadTemplate(MAIN_HTML_NI)
-		if temp_templ != nil {
-			root_templ=temp_templ
-			log.Println("Using Non-Interactive page instead")
-		} else {
-			log.Println("Could not use Non-Interactive page. ")
-		}
-		
-	} else {
-		http.HandleFunc("/addsong", addSongHandler)
-	}
-	
+
 	return http.ListenAndServe(addr, nil)
 }
 
 func loadTemplate(path string) (t *template.Template) {
 	defer func() {
-		if x:=recover(); x!=nil {
-			t=nil
+		if x := recover(); x != nil {
+			t = nil
 		}
 	}()
 	t = template.Must(template.New(path).Funcs(funcMap).ParseFiles(path))
@@ -73,11 +55,33 @@ func loadTemplate(path string) (t *template.Template) {
 
 func rootHandler(w http.ResponseWriter, req *http.Request) {
 	//root_templ = template.Must(template.ParseFiles(MAIN_HTML)) //DEBUGGING
+	_, cookieErr := req.Cookie("session")
+	if cookieErr != nil {
+		//Send to login page instead.
+		return
+	}
 	err := root_templ.Execute(w, templ_f())
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+func loginHandler(w http.ResponseWriter, req *http.Request) {
+	req.ParseForm()
+
+	username := req.Form.Get("username")
+	password := req.Form.Get("password")
+	login := req.Form.Get("login")
+
+	if login != "Login" {
+		//send back to loginpage
+	}
+
+	//Create new FrankConn
+	//If successful
+	//Redirect to statuspage
+
 }
 
 func templ_Handl_Gen(template *template.Template) func(http.ResponseWriter, *http.Request) {
@@ -93,12 +97,13 @@ func templ_Handl_Gen(template *template.Template) func(http.ResponseWriter, *htt
 func addSongHandler(w http.ResponseWriter, req *http.Request) {
 	songtype := req.FormValue("type")
 	link := req.FormValue("link")
-	
+
 	log.Printf("%s requested %s as %s", req.RemoteAddr, link, songtype)
-	
+
 	if link != "" {
 		switch songtype {
-			case "Youtube": AddYoutube(link)
+		case "Youtube":
+			AddYoutube(link)
 		}
 	}
 	w.Write([]byte("Thank you.\n"))
@@ -108,11 +113,13 @@ func voteHandler(w http.ResponseWriter, req *http.Request) {
 	if !*ninteractive {
 		vote := req.FormValue("vote")
 		switch vote {
-			case "Next": VoteNext()
-			case "Prew": VotePrew()
-			case "Clear": VoteClear()
+		case "Next":
+			VoteNext()
+		case "Prew":
+			VotePrew()
+		case "Clear":
+			VoteClear()
 		}
 	}
 	templ_Handl_Gen(vote_templ)(w, req)
 }
-

@@ -1,0 +1,29 @@
+package main
+
+import (
+	wbs "code.google.com/p/go.net/websocket"
+	"fmt"
+	"log"
+	"net"
+	"net/http"
+)
+
+func WSListen(wsAddress string) error {
+	mux := http.NewServeMux()
+	mux.Handle("/", wbs.Handler(wsHandler))
+
+	l, err := net.Listen("tcp", wsAddress)
+	if err != nil {
+		log.Fatal("ListenAndServe:", err)
+	}
+	log.Printf("Listening for websockets on %s", wsAddress)
+	return http.Serve(l, mux)
+}
+
+func wsHandler(ws *wbs.Conn) {
+	defer ws.Close()
+
+	fmt.Println("Websocket connection recieved.")
+	fmt.Println("Handeling user.")
+	handleUser(ws)
+}

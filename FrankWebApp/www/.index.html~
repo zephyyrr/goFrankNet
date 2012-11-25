@@ -1,0 +1,73 @@
+<html>
+<head>
+<title>FrankNet Web</title>
+<link rel="stylesheet" type="text/css" href="/frank.css" />
+<script type="text/javascript" src="/frank.js"></script>
+</head>
+<body>
+<h1>FrankNet Web</h1>
+
+<div id="JSnotSupported">
+This browser does not support javascript.<br/>
+<a href="http://www.google.com/intl/sv/chrome/browser/">try this instead...</a><br/>
+<a href="http://www.firefox.com">or this</a>
+</div>
+
+<div id="WSnotSupported" style="display:none">
+This browser does not support websockets.<br/>
+<a href="http://www.google.com/intl/sv/chrome/browser/">try this instead...</a><br/>
+<a href="http://www.firefox.com">or this</a>
+</div>
+
+<div id="loginArea" style="display:none">
+	<h3>Login</h3>
+	<form>
+		<input id="username" name="username" type="textfield" placeholder="Username" value="Zephyyrr"/><br/>
+		<input id="password" name="password" type="password" placeholder="Password" value="Artizam24"/><br/>
+		<input type="button" id="loginButton" value="login" onclick="login(false)"/>
+		<!--<input type="button" value="register" onclick="login(true)"/>-->
+	</form>
+</div>
+
+<div id="loggedin" style='display:none'>
+<p id="addSongsArea">
+<form id="addSongForm">
+			<select id="addForm_type" name="type">
+				<option>Youtube</option>
+			</select>
+			<input id="addForm_link" type="text" name="link" size=50 value="http://www.youtube.com/watch?v="/>
+			<button type="button" onclick="AddSong(document.getElementById('addForm_type').value, document.getElementById('addForm_link').value)">Add</button>
+		</form>
+</p>
+
+<p id="voteArea">
+	<h3>Vote</h3>
+	<p id="voteData"></p>
+	<button type="button" onclick="vote(Prew)">Previous</button>
+	<button type="button" onclick="vote(Next)">Next</button>
+	<button type="button" onclick="vote(Clear)">Clear</button>
+</p>
+
+<p id="playlistArea">
+<table id="playlist">
+<thead>
+<tr><th colspan="2">Playlist</th></tr>
+<tr><th>#</th><th>Song</th>
+</thead>
+<tbody id="playlistTableBody">
+</tbody>
+</table>
+</p>
+
+<p id="usersArea">
+<h3>Users</h3>
+<ul id="users">
+</ul>
+</p>
+</div>
+</body>
+<script>
+Hide("JSnotSupported")
+Show("loginArea")
+</script>
+</html>

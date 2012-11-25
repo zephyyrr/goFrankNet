@@ -1,0 +1,26 @@
+<html>
+<head>
+<title>Test - Logged in</title>
+</head>
+<body>
+<p>
+Congratulations! You are a member!
+</p>
+
+<form method="post" action="/logout">
+	<input type="submit" value="logout"/>
+</form>
+</body>
+<script>
+var ws = new WebSocket("ws://localhost:2338")
+ws.onopen = function() {
+	ws.send("Hej!")
+}
+ws.onmessage = function(evt) {
+	console.log(evt.data)
+}
+ws.onclose = function() {
+	ws.close()
+}
+</script>
+</html>

@@ -1,0 +1,50 @@
+package main
+
+import (
+	crand "crypto/rand"
+	mrand "math/rand"
+	"encoding/binary"
+	"net/http"
+)
+
+var sessions map[int64]*Session
+var domain = flag.String("-d", "mc.kbkompaniet.org", "Domain name for use in cookies.")
+
+func init() {
+	mrand.Seed(time.Now().Unix())
+}
+
+type Session struct {
+	state State
+}
+
+func NewSession(state State) {
+	c := generateCookie()
+	sessions[c.value] = &Session{state}
+	go
+	
+}
+
+func generateCookie() http.Cookie {
+	id = uint64(0)
+	buf := make([]byte, 8)
+	n, err := crand.Read(buf)
+	if err != nil {
+		id = (uint64(mrand.Uint32()) << 32) | uint64(mrand.Uint32())
+	} else {
+		id = binary.bigEndian.Uint64(buf)
+	}
+	i := 0;
+	for sessions[id] != nil && i < 10 {
+		n, err := crand.Read(buf)
+		if err != nil {
+			id = (uint64(mrand.Uint32()) << 32) | uint64(mrand.Uint32())
+		} else {
+			id = binary.bigEndian.Uint64(buf)
+		}
+	}
+	if i >= 10 {
+		return nil;
+	}
+	return http.Cookie{session, id, "/", *domain, "", 3600, false, true};
+}

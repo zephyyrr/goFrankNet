@@ -125,6 +125,18 @@ handlers[11] = function(sp) {
 //Admin Log
 handlers[13] = function(sp) {console.log(sp.Data)}
 
+//Video Response
+//handlers[14]
+
+//Ping (implemented serverside)
+//handlers[15]
+
+//Voting started
+handlers[16] = function(sp) {
+	document.getElementById('voteData').innerHTML=sp.Data
+	setTimeout(function() {document.getElementById('voteData').innerHTML="No voting currently..."}, 20*1000)
+}
+
 function login(register) {
 	document.getElementById('loginButton').disabled = true
 	if (WebSocket) {
@@ -165,6 +177,20 @@ function AddSong(type, uri) {
 			break
 	}
 	document.getElementById('addSongForm').reset()
+}
+
+function Vote(type) {
+	switch (type) {
+		case "Next":
+			SendClientPacket(new ClientPacket(13))
+			break
+		case "Prew":
+			SendClientPacket(new ClientPacket(14))
+			break
+		case "Clear":
+			SendClientPacket(new ClientPacket(15))
+			break
+	}
 }
 
 function SendClientPacket(cp) {

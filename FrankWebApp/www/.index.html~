@@ -1,6 +1,8 @@
+<!DOCTYPE html>
 <html>
 <head>
 <title>FrankNet Web</title>
+<meta charset="UTF-8">
 <link rel="stylesheet" type="text/css" href="/frank.css" />
 <script type="text/javascript" src="/frank.js"></script>
 </head>
@@ -21,53 +23,73 @@ This browser does not support websockets.<br/>
 
 <div id="loginArea" style="display:none">
 	<h3>Login</h3>
-	<form>
-		<input id="username" name="username" type="textfield" placeholder="Username"/><br/>
+	<form onsubmit="return login(false)">
+		<input id="username" name="username" type="text" placeholder="Username"/><br/>
 		<input id="password" name="password" type="password" placeholder="Password"/><br/>
-		<input type="button" id="loginButton" value="login" onclick="login(false)"/>
-		<!--<input type="button" value="register" onclick="login(true)"/>-->
+		<input type="submit" id="loginButton" value="login"/> <!--onclick="login(document.getElementById('register').checked)"-->
+		Register: <input type="checkbox" id="register" value="register" disabled/>|
+		Remember me: <input type="checkbox" id="remember" value="remember">|
+		Auto-login: <input type="checkbox" id="auto" value="auto">|
 	</form>
 </div>
 
 <div id="loggedin" style='display:none'>
-<p id="addSongsArea">
-<form id="addSongForm">
-			<select id="addForm_type" name="type">
-				<option>Youtube</option>
-			</select>
-			<input id="addForm_link" type="text" name="link" size=50 value="http://www.youtube.com/watch?v="/>
-			<button type="button" onclick="AddSong(document.getElementById('addForm_type').value, document.getElementById('addForm_link').value)">Add</button>
-		</form>
-</p>
+<div id="addSongsArea">
+	<form id="addSongForm">
+		<select id="addForm_type" name="type">
+			<option>Youtube</option>
+		</select>
+		<input id="addForm_link" type="text" name="link" size=50 value="http://www.youtube.com/watch?v="/>
+		<button type="button" onclick="AddSong(document.getElementById('addForm_type').value, document.getElementById('addForm_link').value)">Add</button>
+	</form>
+</div>
 
-<p id="voteArea">
+<div id="voteArea">
 	<h3>Vote</h3>
 	<p id="voteData">No voting currently...</p>
-	<button type="button" onclick="vote(Prew)">Previous</button>
-	<button type="button" onclick="vote(Next)">Next</button>
-	<button type="button" onclick="vote(Clear)">Clear</button>
-</p>
+	<button type="button" onclick="Vote('Prew')">Previous</button>
+	<button type="button" onclick="Vote('Next')">Next</button>
+	<button type="button" onclick="Vote('Clear')">Clear</button>
+</div>
 
-<p id="playlistArea">
-<table id="playlist">
-<thead>
-<tr><th colspan="2">Playlist</th></tr>
-<tr><th>#</th><th>Song</th>
-</thead>
-<tbody id="playlistTableBody">
-</tbody>
-</table>
-</p>
+<div id="playlistArea">
+	<table id="playlist">
+		<thead>
+			<tr><th colspan="2">Playlist</th></tr>
+			<tr><th>#</th><th>Song</th>
+		</thead>
+		<tbody id="playlistTableBody">
+		</tbody>
+	</table>
+</div>
 
-<p id="usersArea">
+<div id="usersArea">
 <h3>Users</h3>
 <ul id="users">
 </ul>
-</p>
 </div>
-</body>
+</div>
+
 <script>
 Hide("JSnotSupported")
 Show("loginArea")
+
+if (localStorage) {
+	if (localStorage.getItem("remember")) {
+		document.getElementById("username").value = localStorage.getItem("username")
+		document.getElementById("password").value = localStorage.getItem("password")
+		document.getElementById("remember").checked = true
+
+		if (localStorage.getItem("auto")) {
+			document.getElementById("auto").checked = true
+			login(false)
+		}
+	}
+} else {
+	document.getElementById("remember").disabled = true
+	document.getElementById("auto").disabled = true
+}
 </script>
+</body>
+
 </html>

@@ -45,18 +45,17 @@ func handleUser(user io.ReadWriteCloser) {
 		username, password = cp.Username, cp.Password
 	}
 	server, err := frank.NewFrankConn(*frankAddr, username, HashPass(password), newAcc)
-	defer func() {
-		server.Close()
-	}()
 
-	if err != nil {
-		user.Write(clientDisconnectPackage)
+	defer func() {
 		if server != nil {
 			server.Close()
 		}
-		user.Close()
+	}()
+	
+	if err != nil {
 		return
 	}
+	
 	go func() {
 		for sp := range server.Incoming {
 			if sp.CommandType == frank.PING {

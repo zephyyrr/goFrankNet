@@ -47,15 +47,14 @@ handlers[5] = function(sp) {alert(sp.Data)}
 
 //Song Update
 handlers[6] = function(sp) {
-	var curr = document.getElementsByClassName("playing")
-	for (var i=0; i<curr.length; i++) {
-			rows[i].setAttribute("class", "")
+	if (document.getElementById("playing")) {
+		document.getElementById("playing").setAttribute("id", "")
 	}
-	
 	var rows = document.getElementById('playlistTableBody').rows;
 	for (var i=0; i<rows.length; i++) {
 		if (rows[i].childNodes[1].innerHTML == sp.NowPlaying) {
 			rows[i].setAttribute("id", "playing")
+			return
 		}
 	}
 }
@@ -133,12 +132,38 @@ handlers[13] = function(sp) {console.log(sp.Data)}
 
 //Voting started
 handlers[16] = function(sp) {
-	document.getElementById('voteData').innerHTML=sp.Data
-	setTimeout(function() {document.getElementById('voteData').innerHTML="No voting currently..."}, 20*1000)
+	document.getElementById('voteData').innerHTML=sp.Data + " votes for "
+	switch (sp.NowPlaying) {
+		case "next": 
+			document.getElementById('voteData').innerHTML+="next song"
+			break
+		case "prew": 
+			document.getElementById('voteData').innerHTML+="previous song"
+			break
+		case "clear": 
+			document.getElementById('voteData').innerHTML+="clearing of playlist"
+			break
+	}
+	setTimeout(function() {document.getElementById('voteData').innerHTML="No voting currently..."}, 15*1000)
 }
 
 function login(register) {
 	document.getElementById('loginButton').disabled = true
+	if (localStorage) {
+		if (document.getElementById("remember").checked) {
+			localStorage.setItem("username", document.getElementById("username").value)
+			localStorage.setItem("password", document.getElementById("password").value)
+			localStorage.setItem("remember", document.getElementById("remember").checked)
+			
+			if (document.getElementById("auto").checked) {
+				localStorage.setItem("auto", document.getElementById("auto").checked)
+			}
+		} else {
+			localStorage.clear()
+		}
+	}
+	
+	
 	if (WebSocket) {
 		ws = new WebSocket("ws://home.zephyyrr.se:2337/ws")
 		ws.onopen = function() {
@@ -148,7 +173,7 @@ function login(register) {
 			SendClientPacket(cp)
 		}
 		ws.onmessage = function(evt) {
-			var sp = eval('(' + evt.data + ')');
+			var sp = JSON.parse(evt.data);
 			if (sp.CommandType === undefined) {
 				sp.CommandType = -1
 			}
@@ -166,6 +191,7 @@ function login(register) {
 		
 	}
 	document.getElementById('loginButton').disabled = false
+	return false
 }
 
 function AddSong(type, uri) {

@@ -43,6 +43,9 @@ func handleUser(user io.ReadWriteCloser) {
 		dec.Decode(cp)
 		//fmt.Println("cp:", cp)
 		username, password = cp.Username, cp.Password
+		if cp.CommandType == frank.NEWACCOUNT {
+			newAcc = true
+		}
 	}
 	server, err := frank.NewFrankConn(*frankAddr, username, HashPass(password), newAcc)
 
@@ -61,6 +64,12 @@ func handleUser(user io.ReadWriteCloser) {
 			if sp.CommandType == frank.PING {
 				cp := server.MakeClientPackage(frank.PONG, "")
 				server.SendClientPackage(cp)
+				b, _ := json.Marshal(sp)
+				_, err := user.Write(b)
+				if err != nil {
+					closing = true
+					return
+				}
 				continue
 			}
 			b, _ := json.Marshal(sp)

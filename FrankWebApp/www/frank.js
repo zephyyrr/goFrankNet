@@ -165,7 +165,7 @@ function login(register) {
 	
 	
 	if (WebSocket) {
-		ws = new WebSocket("ws://home.zephyyrr.se:2337/ws")
+		ws = new WebSocket("ws://" + window.location.host + "/ws")
 		ws.onopen = function() {
 			var cp = new ClientPacket(register ? 2 : 0)
 			cp.Username = document.getElementById("username").value
